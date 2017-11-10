@@ -10,7 +10,16 @@
  */
 SYSCALL init_frm()
 {
-  kprintf("To be implemented!\n");
+  int i = 0;
+  for(i ; i< NFRAMES; i++)
+  {
+	  frm_tab[i].fr_status = FRM_UNMAPPED;
+	  frm_tab[i].fr_pid = -1;
+	  frm_tab[i].fr_vpno = -1;
+	  frm_tab[i].fr_refcnt = 0;
+	  frm_tab[i].fr_type = -1;
+	  frm_tab[i].fr_dirty = 0;
+  }
   return OK;
 }
 
@@ -20,7 +29,7 @@ SYSCALL init_frm()
  */
 SYSCALL get_frm(int* avail)
 {
-  kprintf("To be implemented!\n");
+
   return OK;
 }
 
@@ -31,7 +40,7 @@ SYSCALL get_frm(int* avail)
 SYSCALL free_frm(int i)
 {
 
-  kprintf("To be implemented!\n");
+
   return OK;
 }
 

@@ -28,7 +28,30 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	long	args;			/* arguments (treated like an	*/
 					/* array in the code)		*/
 {
-	kprintf("To be implemented!\n");
+	STATWORD ps;
+	disable(ps);
+	int pid = create(procaddr,ssize,priority,name,nargs,args);
+	int store;
+	struct pentry *pptr = &proctab[pid];
+	if(get_bsm(&store) == SYSERR)
+	{
+		return SYSERR;
+	}
+	if(bsm_map(pid,VIRTUAL_BASE_ADDR,store, hsize) == SYSERR)
+	{
+		return SYSERR;
+	}
+	bsm_tab[store].bs_privacy = 1;
+	pptr->store = store;
+	pptr->vhpno = BACKING_STORE_BASE;
+	pptr->vhpnpages = hsize;
+	pptr->vmemlist = getmem(sizeof(struct mblock));
+	pptr->vmemlist->mlen = hsize*NBPG;
+	pptr->vmemlist->mnext = NULL;
+
+
+
+	restore(ps);
 	return OK;
 }
 

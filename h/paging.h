@@ -96,3 +96,4 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define BACKING_STORE_UNIT_SIZE 0x00100000
 
 #define P_SIZE 1024
+#define VIRTUAL_BASE_ADDR 4096

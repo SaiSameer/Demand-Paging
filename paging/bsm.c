@@ -91,7 +91,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 SYSCALL bsm_map(int pid, int vpno, int source, int npages)
 {
 	struct pentry *pptr = &proctab[pid];
-	if(vpno <4096 || source <0 || source > BS_COUNT || npages <= 0 || npages > 256)
+	if(vpno < VIRTUAL_BASE_ADDR || source <0 || source > BS_COUNT || npages <= 0 || npages > 256)
 	{
 		kprintf("Invalid arguments for bsm_map");
 		return SYSERR;
@@ -124,7 +124,7 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages)
 SYSCALL bsm_unmap(int pid, int vpno, int flag)
 {
 	struct pentry *pptr = &proctab[pid];
-	if(vpno < 4096)
+	if(vpno < VIRTUAL_BASE_ADDR)
 	{
 		kprintf("Invalid arguments for bsm_unmap");
 		return SYSERR;
