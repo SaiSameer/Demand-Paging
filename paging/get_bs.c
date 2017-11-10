@@ -8,7 +8,7 @@ int get_bs(bsd_t bs_id, unsigned int npages) {
   /* requests a new mapping of npages with ID map_id */
     STATWORD ps;
     disable(ps);
-	if((npages<1 || npages >128) || (bs_id < 0 || bs_id >= MAX_ID))
+	if((npages<1 || npages >256) || (bs_id < 0 || bs_id >= BS_COUNT))
 	{
 		kprintf("Backing store ID or pages is out of bound");
 		restore(ps);
@@ -24,8 +24,13 @@ int get_bs(bsd_t bs_id, unsigned int npages) {
 		}
 		npages = bsm_tab[bs_id].bs_npages;		
 	}
-	bsm_tab[bs_id].bs_npages = npages;
-	bsm_tab[bs_id].bs_pid = currpid;
+	else{
+		if(bsm_map(currpid,4096,bs_id,npages) == SYSERR)
+		{
+			restore(ps);
+			return SYSERR;
+		}
+	}
 	
     restore(ps);
     return npages;

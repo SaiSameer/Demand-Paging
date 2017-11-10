@@ -49,6 +49,9 @@ int	console_dev;		/* the console device			*/
 /*  added for the demand paging */
 int page_replace_policy = SC;
 
+bs_map_t bsm_tab[BS_COUNT];
+fr_map_t frm_tab[NFRAMES];
+
 int global_pt[4];
 
 /************************************************************************/
@@ -257,6 +260,15 @@ sysinit()
 
 		}
 	}
+
+	/* Set PDBR register to pd of NULLPROC */
+	write_cr3(proctab[currpid].pdbr);
+
+	/* Install page fault ISR */
+	set_evec(14,(ulong)pfintr);
+
+	/* Enable paging */
+	enable_paging();
 
 	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 

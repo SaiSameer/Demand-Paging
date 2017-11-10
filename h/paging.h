@@ -48,7 +48,8 @@ typedef struct{
   int bs_vpno;				/* starting virtual page number */
   int bs_npages;			/* number of pages in the store */
   int bs_sem;				/* semaphore mechanism ?	*/
-  int bs_privacy;			
+  int bs_privacy;
+  int bs_refcnt;
 } bs_map_t;
 
 typedef struct{
@@ -76,6 +77,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
 #define NFRAMES 	1024	/* number of frames		*/
+#define BS_COUNT	8		/* number of backing stores */
 
 #define BSM_UNMAPPED	0
 #define BSM_MAPPED	1
