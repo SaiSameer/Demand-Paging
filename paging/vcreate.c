@@ -52,7 +52,7 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 
 
 	restore(ps);
-	return OK;
+	return pid;
 }
 
 /*------------------------------------------------------------------------
