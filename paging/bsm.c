@@ -130,28 +130,45 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 		return SYSERR;
 	}
 	int  store, bs_offset;
-	if(bsm_lookup(pid, vpno*NBPG, &store, &bs_offset) == SYSERR)
+	if(bsm_lookup(pid, vpno*VIRTUAL_BASE_ADDR, &store, &bs_offset) == SYSERR)
 	{
 		return SYSERR;
 	}
-	for(int i =0; i< NFRAMES; i++)
+	int i =0;
+	for(i; i<NFRAMES; i++)
 	{
-		if(frm_tab[i].fr_pid==pid && frm_tab[i].fr_type == FR_PAGE)
+		if(frm_tab[i].fr_pid == pid && frm_tab[i].fr_type == FR_PAGE)
 		{
-			free_frm(i);
+			if((frm_tab[i].fr_vpno > pptr->bsm_tab[i].bs_vpno)
+					&& (frm_tab[i].fr_vpno < pptr->bsm_tab[i].bs_vpno + pptr->bsm_tab[i].bs_npages))
+			{
+				if(flag == 0)
+				{
+					if( free_frm(i) == SYSERR)
+					{
+						return SYSERR;
+					}
+				}
+				else
+				{
+					if(free_prvt_frm(i) == SYSERR){
+						return SYSERR;
+					}
+				}
+			}
 		}
-		pptr->bsm_tab[store].bs_status = BSM_UNMAPPED;
-		pptr->bsm_tab[store].bs_pid = -1;
-		pptr->bsm_tab[store].bs_vpno = -1;
-		pptr->bsm_tab[store].bs_npages = 0;
-		pptr->bsm_tab[store].bs_privacy =0;
-		pptr->bsm_tab[store].bs_refcnt--;
-		bsm_tab[store].bs_refcnt--;
-		if(bsm_tab[store].bs_refcnt == 0)
-		{
-			bsm_tab[store].bs_status = BSM_UNMAPPED;
-			bsm_tab[store].bs_privacy = 0;
-		}
+	}
+	pptr->bsm_tab[store].bs_status = BSM_UNMAPPED;
+	pptr->bsm_tab[store].bs_pid = -1;
+	pptr->bsm_tab[store].bs_vpno = -1;
+	pptr->bsm_tab[store].bs_npages = 0;
+	pptr->bsm_tab[store].bs_privacy =0;
+	pptr->bsm_tab[store].bs_refcnt--;
+	bsm_tab[store].bs_refcnt--;
+	if(bsm_tab[store].bs_refcnt == 0)
+	{
+		bsm_tab[store].bs_status = BSM_UNMAPPED;
+		bsm_tab[store].bs_privacy = 0;
 	}
 	return OK;
 

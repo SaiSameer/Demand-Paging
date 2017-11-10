@@ -44,5 +44,19 @@ SYSCALL free_frm(int i)
   return OK;
 }
 
+/*-------------------------------------------------------------------------
+ * free_prvt_frm - free a frame mapped to private page
+ *-------------------------------------------------------------------------
+ */
+SYSCALL free_prvt_frm(int i)
+{
+	frm_tab[i].fr_status = FRM_UNMAPPED;
+	frm_tab[i].fr_pid = -1;
+	frm_tab[i].fr_vpno = -1;
+	frm_tab[i].fr_refcnt = 0;
+	frm_tab[i].fr_type = -1;
+	frm_tab[i].fr_dirty = 0;
 
 
+  return OK;
+}

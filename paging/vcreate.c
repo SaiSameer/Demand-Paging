@@ -47,9 +47,10 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	pptr->vhpnpages = hsize;
 	pptr->vmemlist = getmem(sizeof(struct mblock));
 	pptr->vmemlist->mlen = hsize*NBPG;
-	pptr->vmemlist->mnext = NULL;
-
-
+	pptr->vmemlist->mnext = VIRTUAL_BASE_ADDR*NBPG;
+	struct mblock * mb = BACKING_STORE_BASE + store*BACKING_STORE_UNIT_SIZE;
+	mb->mlen = hsize* NBPG;
+	mb->mnext = NULL;
 
 	restore(ps);
 	return pid;

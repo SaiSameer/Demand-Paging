@@ -265,7 +265,7 @@ sysinit()
 	write_cr3(proctab[currpid].pdbr);
 
 	/* Install page fault ISR */
-	set_evec(14,(ulong)pfintr);
+	set_evec(14,(u_long)pfintr);
 
 	/* Enable paging */
 	enable_paging();

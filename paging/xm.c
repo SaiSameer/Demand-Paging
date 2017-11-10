@@ -38,11 +38,11 @@ SYSCALL xmunmap(int virtpage)
 {
   STATWORD ps;
   disable(ps);
-  if(virtpage <4096){
+  if(virtpage < VIRTUAL_BASE_ADDR){
 	  restore(ps);
 	  return SYSERR;
   }
-  if(bsm_unmap(currpid,virtpage) == SYSERR)
+  if(bsm_unmap(currpid,virtpage,0) == SYSERR)
   {
 	  restore(ps);
 	  return SYSERR;
