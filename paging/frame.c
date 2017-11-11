@@ -57,6 +57,5 @@ SYSCALL free_prvt_frm(int i)
 	frm_tab[i].fr_type = -1;
 	frm_tab[i].fr_dirty = 0;
 
-
   return OK;
 }

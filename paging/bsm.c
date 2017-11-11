@@ -139,8 +139,8 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 	{
 		if(frm_tab[i].fr_pid == pid && frm_tab[i].fr_type == FR_PAGE)
 		{
-			if((frm_tab[i].fr_vpno > pptr->bsm_tab[i].bs_vpno)
-					&& (frm_tab[i].fr_vpno < pptr->bsm_tab[i].bs_vpno + pptr->bsm_tab[i].bs_npages))
+			if((frm_tab[i].fr_vpno > pptr->bsm_tab[store].bs_vpno)
+					&& (frm_tab[i].fr_vpno < pptr->bsm_tab[store].bs_vpno + pptr->bsm_tab[store].bs_npages))
 			{
 				if(flag == 0)
 				{
@@ -173,5 +173,4 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 	return OK;
 
 }
-
 

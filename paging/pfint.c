@@ -12,7 +12,13 @@
 SYSCALL pfint()
 {
 
-  kprintf("To be implemented!\n");
+  STATWORD ps;
+  disable(ps);
+  unsigned long a = read_cr2();
+  virt_addr_t * virt_addr_a =(virt_addr_t *)&a;
+
+
+  restore(ps);
   return OK;
 }
 

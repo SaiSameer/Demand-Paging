@@ -220,46 +220,10 @@ sysinit()
 		init_frm();
 
 	/*Create global page tables that map the physical 16 MB */
-	int frame = -1;
-	for(int i=0; i<4 ; i++)
-	{
-		get_frm(&frame);
-		global_pt[i] = frame;
-		frm_tab[frame].fr_status = FRM_MAPPED;
-		frm_tab[frame].fr_pid = currpid;
-		frm_tab[frame].fr_type = FR_TBL;
-		frm_tab[frame].fr_vpno = -1;
-		pt_t *pt_entry = (FRAME0+frame) * NBPG;
-		for(int j=0; j<P_SIZE; j++)
-		{
-			pt_entry->pt_pres = 1;
-			pt_entry->pt_write = 1;
-			pt_entry->pt_global = 1;
-			pt_entry->pt_base = i*P_SIZE + j;
-			pt_entry++;
-		}
-	}
+	create_global_pt();
 
 	/* Allocate and initialize page directory for NULLPROC */
-
-	int frame = -1;
-	get_frm(&frame);
-	frm_tab[frame].fr_status = FRM_MAPPED;
-	frm_tab[frame].fr_pid = currpid;
-	frm_tab[frame].fr_type = FR_DIR;
-	frm_tab[frame].fr_vpno = -1;
-	pd_t *pd_entry = proctab[currpid].pdbr = (FRAME0+frame)*NBPG;
-	for(int j=0; j< P_SIZE; j++)
-	{
-		pd_entry->pd_write = 1;
-		pd_entry++;
-		if(j<4)
-		{
-			pd_entry->pd_pres = 1;
-			pd_entry->pd_base = i + global_pt[j];
-
-		}
-	}
+	create_page_directory();
 
 	/* Set PDBR register to pd of NULLPROC */
 	write_cr3(proctab[currpid].pdbr);
@@ -325,4 +289,59 @@ long sizmem()
 		}
 	}
 	return npages;
+}
+
+/*------------------------------------------------------------------------
+ * create_global_pt - creates 4 global page tables
+ *------------------------------------------------------------------------
+ */
+
+void create_global_pt()
+{
+	int frame = -1;
+	for(int i=0; i<4 ; i++)
+	{
+		get_frm(&frame);
+		global_pt[i] = frame;
+		frm_tab[frame].fr_status = FRM_MAPPED;
+		frm_tab[frame].fr_pid = currpid;
+		frm_tab[frame].fr_type = FR_TBL;
+		frm_tab[frame].fr_vpno = -1;
+		pt_t *pt_entry = (FRAME0+frame) * NBPG;
+		for(int j=0; j<P_SIZE; j++)
+		{
+			pt_entry->pt_pres = 1;
+			pt_entry->pt_write = 1;
+			pt_entry->pt_global = 1;
+			pt_entry->pt_base = i*P_SIZE + j;
+			pt_entry++;
+		}
+	}
+}
+
+/*------------------------------------------------------------------------
+ * create_page_directory - creates page directory
+ *------------------------------------------------------------------------
+ */
+
+void create_page_directory()
+{
+	int frame = -1;
+	get_frm(&frame);
+	frm_tab[frame].fr_status = FRM_MAPPED;
+	frm_tab[frame].fr_pid = currpid;
+	frm_tab[frame].fr_type = FR_DIR;
+	frm_tab[frame].fr_vpno = -1;
+	pd_t *pd_entry = proctab[currpid].pdbr = (FRAME0+frame)*NBPG;
+	for(int j=0; j< P_SIZE; j++)
+	{
+		pd_entry->pd_write = 1;
+		if(j<4)
+		{
+			pd_entry->pd_pres = 1;
+			pd_entry->pd_base = FRAME0 + global_pt[j];
+		}
+		pd_entry++;
+	}
+
 }

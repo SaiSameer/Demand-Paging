@@ -49,19 +49,15 @@ SYSCALL kill(int pid)
 			}
 		}
 	}
-	for(i=0; i<NFRAMES; i++)
-	{
-		if(frm_tab[i].fr_pid == pid &&  frm_tab[i].fr_status == FRM_MAPPED)
-		{
-			frm_tab[i].fr_status = FRM_UNMAPPED;
-			frm_tab[i].fr_pid = -1;
-			frm_tab[i].fr_vpno = -1;
-			frm_tab[i].fr_refcnt = 0;
-			frm_tab[i].fr_type = -1;
-			frm_tab[i].fr_dirty = 0;
-		}
-	}
 	
+	int pd_frm = proctab[pid].pdbr / NBPG - FRAME0;
+	frm_tab[pd_frm].fr_status = FRM_UNMAPPED;
+	frm_tab[pd_frm].fr_pid = -1;
+	frm_tab[pd_frm].fr_vpno = -1;
+	frm_tab[pd_frm].fr_refcnt = 0;
+	frm_tab[pd_frm].fr_type = -1;
+	frm_tab[pd_frm].fr_dirty = 0;
+
 	send(pptr->pnxtkin, pid);
 
 	freestk(pptr->pbase, pptr->pstklen);
