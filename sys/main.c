@@ -25,7 +25,6 @@ void proc1_test1(char *msg, int lck) {
 
 	addr = (char*) PROC1_VADDR;
 	for (i = 0; i < 26; i++) {
-		kprintf("Adding number %d\n",i);
 		*(addr + i * NBPG) = 'A' + i;
 	}
 	kprintf("All values added\n");

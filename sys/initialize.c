@@ -219,7 +219,7 @@ sysinit()
 		init_queue();
 
 	/*Create global page tables that map the physical 16 MB */
-	create_global_pt();
+	create_global_pt(currpid);
 
 	/* Allocate and initialize page directory for NULLPROC */
 	create_page_directory(currpid);
@@ -292,7 +292,7 @@ long sizmem()
  *------------------------------------------------------------------------
  */
 
-void create_global_pt()
+void create_global_pt(int pid)
 {
 	int i =0, j=0;
 	int frame = -1;
@@ -301,7 +301,7 @@ void create_global_pt()
 		get_frm(&frame);
 		global_pt[i] = frame;
 		frm_tab[frame].fr_status = FRM_MAPPED;
-		frm_tab[frame].fr_pid = currpid;
+		frm_tab[frame].fr_pid = pid;
 		frm_tab[frame].fr_type = FR_TBL;
 		frm_tab[frame].fr_vpno = -1;
 		frm_tab[frame].fr_sc = 1;
