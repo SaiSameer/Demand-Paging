@@ -72,7 +72,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 	int vpno = vaddr/NBPG;
 	for(i ; i< BS_COUNT; i++ )
 	{
-		if((pptr->bsm_tab[i].bs_status == BSM_MAPPED) && (pptr->bsm_tab.bs_vpno <= vpno
+		if((pptr->bsm_tab[i].bs_status == BSM_MAPPED) && (pptr->bsm_tab[i].bs_vpno <= vpno
 				&& vpno < pptr->bsm_tab[i].bs_vpno + pptr->bsm_tab[i].bs_npages))
 		{
 			*store = i;

@@ -14,7 +14,7 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages)
 {
   STATWORD ps;
   disable(ps);
-  if(virtpage < 4096 || source <0 || source >= BS_COUNT || npages <= 0 || npages > 256)
+  if(virtpage < VIRTUAL_BASE_ADDR || source <0 || source >= BS_COUNT || npages <= 0 || npages > 256)
   {
   	restore(ps);
 	return SYSERR;

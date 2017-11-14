@@ -19,12 +19,12 @@ WORD	*vgetmem(nbytes)
 
 	disable(ps);
 	struct pentry *pptr = &proctab[currpid];
-	if (nbytes==0 || pptr->vmemlist.mnext== (struct mblock *) NULL) {
+	if (nbytes==0 || pptr->vmemlist->mnext== (struct mblock *) NULL) {
 		restore(ps);
 		return( (WORD *)SYSERR);
 	}
 	nbytes = (unsigned int) roundmb(nbytes);
-	for (q= &pptr->vmemlist,p=pptr->vmemlist.mnext ;
+	for (q= &pptr->vmemlist,p=pptr->vmemlist->mnext ;
 	     p != (struct mblock *) NULL ;
 	     q=p,p=p->mnext)
 		if ( p->mlen == nbytes) {

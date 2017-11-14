@@ -82,7 +82,6 @@ nulluser()				/* babysit CPU when no one is home */
 
 	kprintf("system running up!\n");
 	sysinit();
-
 	enable();		/* enable interrupts */
 
 	sprintf(vers, "PC Xinu %s", VERSION);
@@ -91,7 +90,6 @@ nulluser()				/* babysit CPU when no one is home */
 		kprintf("\n");
 	else
 		kprintf("   (reboot %d)\n", reboot);
-
 
 	kprintf("%d bytes real mem\n",
 		(unsigned long) maxaddr+1);
@@ -119,8 +117,8 @@ nulluser()				/* babysit CPU when no one is home */
 
 	/* create a process to execute the user's main program */
 	userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARGS);
-	resume(userpid);
 
+	resume(userpid);
 	while (TRUE)
 		/* empty */;
 }
@@ -138,8 +136,6 @@ sysinit()
 	struct	sentry	*sptr;
 	struct	mblock	*mptr;
 	SYSCALL pfintr();
-
-	
 
 	numproc = 0;			/* initialize system variables */
 	nextproc = NPROC-1;
@@ -215,15 +211,17 @@ sysinit()
 		sptr->sqtail = 1 + (sptr->sqhead = newqueue());
 	}
 
+	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
 	/* Initializing all necessary data structures*/
 		init_bsm();
 		init_frm();
+		init_queue();
 
 	/*Create global page tables that map the physical 16 MB */
 	create_global_pt();
 
 	/* Allocate and initialize page directory for NULLPROC */
-	create_page_directory();
+	create_page_directory(currpid);
 
 	/* Set PDBR register to pd of NULLPROC */
 	write_cr3(proctab[currpid].pdbr);
@@ -233,9 +231,6 @@ sysinit()
 
 	/* Enable paging */
 	enable_paging();
-
-	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
-
 
 	return(OK);
 }
@@ -298,8 +293,9 @@ long sizmem()
 
 void create_global_pt()
 {
+	int i =0, j=0;
 	int frame = -1;
-	for(int i=0; i<4 ; i++)
+	for(i; i<4 ; i++)
 	{
 		get_frm(&frame);
 		global_pt[i] = frame;
@@ -307,8 +303,9 @@ void create_global_pt()
 		frm_tab[frame].fr_pid = currpid;
 		frm_tab[frame].fr_type = FR_TBL;
 		frm_tab[frame].fr_vpno = -1;
+		frm_tab[frame].fr_sc = 1;
 		pt_t *pt_entry = (FRAME0+frame) * NBPG;
-		for(int j=0; j<P_SIZE; j++)
+		for(j=0; j<P_SIZE; j++)
 		{
 			pt_entry->pt_pres = 1;
 			pt_entry->pt_write = 1;
@@ -324,16 +321,19 @@ void create_global_pt()
  *------------------------------------------------------------------------
  */
 
-void create_page_directory()
+void create_page_directory(int pid)
 {
+	int j=0;
 	int frame = -1;
 	get_frm(&frame);
 	frm_tab[frame].fr_status = FRM_MAPPED;
-	frm_tab[frame].fr_pid = currpid;
+	frm_tab[frame].fr_pid = pid;
 	frm_tab[frame].fr_type = FR_DIR;
 	frm_tab[frame].fr_vpno = -1;
-	pd_t *pd_entry = proctab[currpid].pdbr = (FRAME0+frame)*NBPG;
-	for(int j=0; j< P_SIZE; j++)
+	frm_tab[frame].fr_sc = 1;
+	proctab[pid].pdbr = (FRAME0+frame)*NBPG;
+	pd_t *pd_entry = (FRAME0+frame)*NBPG;
+	for(j; j< P_SIZE; j++)
 	{
 		pd_entry->pd_write = 1;
 		if(j<4)

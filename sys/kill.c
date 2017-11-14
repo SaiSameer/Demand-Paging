@@ -41,10 +41,16 @@ SYSCALL kill(int pid)
 	int i=0;
 	for(i; i< BS_COUNT; i++)
 	{
-		if(bsm_tab[i].bs_pid == pid)
+		if(proctab[pid].bsm_tab[i].bs_status == BSM_MAPPED)
 		{
+			if(proctab[pid].bsm_tab[i].bs_vpno < VIRTUAL_BASE_ADDR){
+				kprintf("Invalid bs_vpno is %d\n", proctab[pid].bsm_tab[i].bs_vpno);
+				kprintf("for process id %d \n",pid);
+				break;
+			}
 			if(bsm_unmap(pid, proctab[pid].bsm_tab[i].bs_vpno, proctab[pid].bsm_tab[i].bs_privacy) == SYSERR)
 			{
+				kprintf("BSM UNMAP error in kill\n");
 				return SYSERR;
 			}
 		}
@@ -57,6 +63,7 @@ SYSCALL kill(int pid)
 	frm_tab[pd_frm].fr_refcnt = 0;
 	frm_tab[pd_frm].fr_type = -1;
 	frm_tab[pd_frm].fr_dirty = 0;
+	frm_tab[pd_frm].fr_sc = 1;
 
 	send(pptr->pnxtkin, pid);
 

@@ -95,11 +95,11 @@ SYSCALL create(procaddr,ssize,priority,name,nargs,args)
 	*--saddr = 0;		/* %esi */
 	*--saddr = 0;		/* %edi */
 	*pushsp = pptr->pesp = (unsigned long)saddr;
-	int i=0;
+
 	for(i ; i< BS_COUNT; i++)
 	{
 		pptr->bsm_tab[i].bs_status = BSM_UNMAPPED;
-		pptr->bsm_tab[i].bs_pid = pid;
+		pptr->bsm_tab[i].bs_pid = -1;
 		pptr->bsm_tab[i].bs_vpno = -1;
 		pptr->bsm_tab[i].bs_npages = 0;
 		pptr->bsm_tab[i].bs_sem = 0;
@@ -107,7 +107,7 @@ SYSCALL create(procaddr,ssize,priority,name,nargs,args)
 		pptr->bsm_tab[i].bs_refcnt = 0;
 	}
 
-	create_page_directory();
+	create_page_directory(pid);
 
 	restore(ps);
 

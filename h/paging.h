@@ -1,5 +1,6 @@
 /* paging.h */
-
+#ifndef _PAGING_H_
+#define _PAGING_H_
 typedef unsigned int	 bsd_t;
 
 /* Structure for a page directory entry */
@@ -59,7 +60,13 @@ typedef struct{
   int fr_refcnt;			/* reference count		*/
   int fr_type;				/* FR_DIR, FR_TBL, FR_PAGE	*/
   int fr_dirty;
+  int fr_sc;
 }fr_map_t;
+
+typedef struct{
+  int next;
+  int prev;
+}queue;
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
@@ -67,6 +74,8 @@ extern fr_map_t frm_tab[];
 SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
 
+extern qhead;
+extern queue q[];
 /* given calls for dealing with backing store */
 
 int get_bs(bsd_t, unsigned int);
@@ -97,3 +106,5 @@ SYSCALL write_bs(char *, bsd_t, int);
 
 #define P_SIZE 1024
 #define VIRTUAL_BASE_ADDR 4096
+
+#endif

@@ -13,7 +13,7 @@ extern int page_replace_policy;
 SYSCALL srpolicy(int policy)
 {
   /* sanity check ! */
-  if(policy != SC || policy != AGING)
+  if(policy != SC && policy != AGING)
   {
 	  kprintf("Invalid policy");
 	  return SYSERR;

@@ -23,6 +23,7 @@ int	resched()
 	register int i;
 
 	disable(PS);
+	//kprintf("Inside resched \n");
 	/* no switch needed if current process priority higher than next*/
 
 	if ( ( (optr= &proctab[currpid])->pstate == PRCURR) &&
@@ -31,6 +32,7 @@ int	resched()
 		return(OK);
 	}
 	
+
 #ifdef STKCHK
 	/* make sure current stack has room for ctsw */
 	asm("movl	%esp, currSP");
@@ -82,7 +84,7 @@ int	resched()
 #ifdef	DEBUG
 	PrintSaved(nptr);
 #endif
-	
+
 	write_cr3(nptr->pdbr);
 	ctxsw(&optr->pesp, optr->pirmask, &nptr->pesp, nptr->pirmask);
 

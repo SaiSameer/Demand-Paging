@@ -23,7 +23,7 @@ SYSCALL	vfreemem(block, size)
 	size = (unsigned)roundmb(size);
 	disable(ps);
 	struct pentry *pptr = &proctab[currpid];
-	for( p=pptr->vmemlist.mnext,q= &pptr->vmemlist;
+	for( p=pptr->vmemlist->mnext,q= &pptr->vmemlist;
 		 p != (struct mblock *) NULL && p < block ;
 		 q=p,p=p->mnext )
 		;
