@@ -20,6 +20,7 @@ SYSCALL pfint()
   virt_addr_t * virt_addr_a =(virt_addr_t *)&a;
   pd_t *pd = pptr->pdbr + sizeof(pd_t) * virt_addr_a->pd_offset;
   int store, pageth;
+  kprintf("Insidde pfint\n");
   if(bsm_lookup(currpid, a, &store, &pageth) == SYSERR)
   {
 	  kill(currpid);
@@ -55,6 +56,7 @@ SYSCALL pfint()
 	  pd->pd_write = 1;
 	  pd->pd_global = 0;
 	  pd->pd_base =	FRAME0 + frame;
+
   }
   pt_t *pt = (pt_t *)(pd->pd_base * NBPG + sizeof(pt_t) * virt_addr_a->pt_offset );
   if(pt->pt_pres == 0)
@@ -83,6 +85,7 @@ SYSCALL pfint()
 	  pt->pt_dirty =0;
 	  pt->pt_base = FRAME0 + frame;
 	  read_bs((FRAME0 + frame)* NBPG,store, pageth);
+	  insert_qframe(frame);
   }
   write_cr3(pptr->pdbr);
   restore(ps);

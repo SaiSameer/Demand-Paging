@@ -25,8 +25,10 @@ void proc1_test1(char *msg, int lck) {
 
 	addr = (char*) PROC1_VADDR;
 	for (i = 0; i < 26; i++) {
+		kprintf("Adding number %d\n",i);
 		*(addr + i * NBPG) = 'A' + i;
 	}
+	kprintf("All values added\n");
 
 	sleep(6);
 
@@ -72,6 +74,7 @@ void proc1_test3(char *msg, int lck) {
 int main() {
 	int pid1;
 	int pid2;
+	srpolicy(3);
 
 	kprintf("\n1: shared memory\n");
 	pid1 = create(proc1_test1, 2000, 20, "proc1_test1", 0, NULL);

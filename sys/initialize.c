@@ -53,6 +53,7 @@ bs_map_t bsm_tab[BS_COUNT];
 fr_map_t frm_tab[NFRAMES];
 
 int global_pt[4];
+int policy_print = 0;
 
 /************************************************************************/
 /***				NOTE:				      ***/

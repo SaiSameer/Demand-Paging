@@ -6,6 +6,7 @@
 
 
 extern int page_replace_policy;
+extern int policy_print;
 /*-------------------------------------------------------------------------
  * srpolicy - set page replace policy 
  *-------------------------------------------------------------------------
@@ -19,6 +20,7 @@ SYSCALL srpolicy(int policy)
 	  return SYSERR;
   }
   page_replace_policy = policy;
+  policy_print = 1;
 
   return OK;
 }

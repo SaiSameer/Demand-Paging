@@ -66,7 +66,7 @@ typedef struct{
 typedef struct{
   int next;
   int prev;
-}queue;
+}rqueue;
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
@@ -75,7 +75,7 @@ SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
 
 extern qhead;
-extern queue q[];
+extern rqueue rq[];
 /* given calls for dealing with backing store */
 
 int get_bs(bsd_t, unsigned int);
@@ -85,7 +85,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
-#define NFRAMES 	1024	/* number of frames		*/
+#define NFRAMES 	30	/* number of frames		*/
 #define BS_COUNT	8		/* number of backing stores */
 
 #define BSM_UNMAPPED	0

@@ -11,7 +11,7 @@ SYSCALL release_bs(bsd_t bs_id) {
 	{
 		if(proctab[i].bsm_tab[bs_id].bs_status == BSM_MAPPED)
 		{
-			proctab[i].bsm_tab[bs_id].bs_status == BSM_UNMAPPED;
+			proctab[i].bsm_tab[bs_id].bs_status = BSM_UNMAPPED;
 			proctab[i].bsm_tab[bs_id].bs_pid = -1;
 			proctab[i].bsm_tab[bs_id].bs_vpno = -1;
 			proctab[i].bsm_tab[bs_id].bs_npages = 0;

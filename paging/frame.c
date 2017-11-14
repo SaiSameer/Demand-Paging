@@ -6,8 +6,9 @@
 
 int sc_start_frm = 0;
 int qhead =0;
-queue q[NFRAMES];
+rqueue rq[NFRAMES];
 extern int page_replace_policy;
+extern int policy_print;
 
 
 /*-------------------------------------------------------------------------
@@ -19,12 +20,30 @@ void init_queue()
   int i = 0;
   for(i ; i< NFRAMES; i++)
   {
-	  q[i].next = -1;
-	  q[i].prev = -1;
+	  rq[i].next = -1;
+	  rq[i].prev = -1;
   }
-  return OK;
+  return;
 }
 
+
+/*-------------------------------------------------------------------------
+ * insert_qframe - insert a frame into queue
+ *-------------------------------------------------------------------------
+ */
+void insert_qframe(i)
+{
+  int prev = rq[qhead].prev;
+  if(qhead == -1)
+  {
+	  rq[i].next = rq[i].prev = i;
+	  qhead = i;
+	  return;
+  }
+  rq[prev].next = i;
+  rq[qhead].prev = i;
+  return;
+}
 
 /*-------------------------------------------------------------------------
  * remove_qframe - remove a frame from queue
@@ -32,8 +51,20 @@ void init_queue()
  */
 void remove_qframe(i)
 {
-
-  return OK;
+  int qprev = rq[i].prev;
+  int qnext = rq[i].next;
+  if(qprev == qnext)
+  {
+	  qhead = -1;
+	  return;
+  }
+  if(i == qhead)
+  {
+	  qhead = qnext;
+  }
+  rq[qprev].next = rq[i].next;
+  rq[qnext].prev = rq[i].prev;
+  return;
 }
 
 
@@ -65,8 +96,9 @@ SYSCALL get_frm(int* avail)
 {
   STATWORD ps;
   disable(ps);
-  struct pentry *pptr = &proctab[frm_tab[i].fr_pid];
   int i =0;
+
+  //kprintf("PFINTR\n");
   for(i; i<NFRAMES; i++)
   {
 	  if(frm_tab[i].fr_status == FRM_UNMAPPED)
@@ -78,9 +110,11 @@ SYSCALL get_frm(int* avail)
   }
   if(page_replace_policy == SC)
   {
+	  kprintf("SC");
 	  i = qhead;
 	  while(1)
 	  {
+		  struct pentry *pptr = &proctab[frm_tab[i].fr_pid];
 		  virt_addr_t * vf = (virt_addr_t *)(frm_tab[i].fr_vpno<<12);
 		  pd_t * pd =  pptr->pdbr + sizeof(pd_t) * vf->pd_offset ;
 		  pt_t * pt = pd->pd_base * NBPG + sizeof(pt_t) * vf->pt_offset;
@@ -91,18 +125,58 @@ SYSCALL get_frm(int* avail)
 		  else
 		  {
 			  free_frm(i);
-			  kprintf("Frame %d is being replaced through SC", i);
+			  if(policy_print == 1)
+			  {
+				  kprintf("Frame %d is being replaced through SC", i);
+			  }
 			  *avail = i;
-			  qhead = q[i].next;
+			  qhead = rq[i].next;
 			  remove_qframe(i);
 			  restore(ps);
 			  return OK;
 		  }
-		  i = q[i].next;
+		  i = rq[i].next;
 	  }
   }
   if(page_replace_policy == AGING)
   {
+	  kprintf("Aging");
+	  i = qhead;
+	  int young_age = 256;
+	  int young_f = i;
+	  while(1){
+		  struct pentry *pptr = &proctab[frm_tab[i].fr_pid];
+		  virt_addr_t * vf = (virt_addr_t *)(frm_tab[i].fr_vpno<<12);
+		  pd_t * pd =  pptr->pdbr + sizeof(pd_t) * vf->pd_offset ;
+		  pt_t * pt = pd->pd_base * NBPG + sizeof(pt_t) * vf->pt_offset;
+		  if(pt->pt_acc == 1)
+		  {
+			  pt->pt_acc = 0;
+			  frm_tab[i].fr_sc = frm_tab[i].fr_sc << 1;
+			  if(frm_tab[i].fr_sc > 255)
+			  {
+				  frm_tab[i].fr_sc = 255;
+			  }
+		  }
+		  if(young_age > frm_tab[i].fr_sc )
+		  {
+			  young_age = frm_tab[i].fr_sc;
+			  young_f = i;
+		  }
+		  i = rq[i].next;
+		  if(i == qhead)
+		  {
+			  free_frm(young_f);
+			  if(policy_print == 1){
+				  kprintf("Frame %d is being replaced through Aging", i);
+			  }
+			  *avail = young_f;
+			  qhead = rq[i].next;
+			  remove_qframe(i);
+			  restore(ps);
+			  return OK;
+		  }
+	  }
 
   }
   restore(ps);
