@@ -72,12 +72,13 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 	int vpno = vaddr/NBPG;
 	for(i ; i< BS_COUNT; i++ )
 	{
-		if((pptr->bsm_tab[i].bs_status == BSM_MAPPED) && (pptr->bsm_tab[i].bs_vpno <= vpno
-				&& vpno < pptr->bsm_tab[i].bs_vpno + pptr->bsm_tab[i].bs_npages))
+		if((pptr->bsm_tab[i].bs_status == BSM_MAPPED) )
 		{
+			if(pptr->bsm_tab[i].bs_vpno <= vpno && vpno < (pptr->bsm_tab[i].bs_vpno + pptr->bsm_tab[i].bs_npages)){
 			*store = i;
 			*pageth = vpno - pptr->bsm_tab[i].bs_vpno;
 			return OK;
+			}
 		}
 	}
 	return SYSERR;
@@ -132,6 +133,7 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 	int  store, bs_offset;
 	if(bsm_lookup(pid, vpno*VIRTUAL_BASE_ADDR, &store, &bs_offset) == SYSERR)
 	{
+		kprintf("lookup error \n");
 		return SYSERR;
 	}
 	int i =0;
@@ -146,12 +148,14 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 				{
 					if( free_frm(i) == SYSERR)
 					{
+						kprintf("free_frm lookup error \n");
 						return SYSERR;
 					}
 				}
 				else
 				{
 					if(free_prvt_frm(i) == SYSERR){
+						kprintf("free_frm private lookup error \n");
 						return SYSERR;
 					}
 				}

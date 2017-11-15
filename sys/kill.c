@@ -39,6 +39,8 @@ SYSCALL kill(int pid)
 		close(dev);
 
 	int i=0;
+	sleep(3);
+
 	for(i; i< BS_COUNT; i++)
 	{
 		if(proctab[pid].bsm_tab[i].bs_status == BSM_MAPPED)

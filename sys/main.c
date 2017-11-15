@@ -73,7 +73,7 @@ void proc1_test3(char *msg, int lck) {
 int main() {
 	int pid1;
 	int pid2;
-	srpolicy(3);
+	srpolicy(AGING);
 
 	kprintf("\n1: shared memory\n");
 	pid1 = create(proc1_test1, 2000, 20, "proc1_test1", 0, NULL);

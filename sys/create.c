@@ -96,7 +96,7 @@ SYSCALL create(procaddr,ssize,priority,name,nargs,args)
 	*--saddr = 0;		/* %edi */
 	*pushsp = pptr->pesp = (unsigned long)saddr;
 
-	for(i ; i< BS_COUNT; i++)
+	for(i=0 ; i< BS_COUNT; i++)
 	{
 		pptr->bsm_tab[i].bs_status = BSM_UNMAPPED;
 		pptr->bsm_tab[i].bs_pid = -1;

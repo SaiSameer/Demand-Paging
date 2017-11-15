@@ -205,7 +205,7 @@ SYSCALL free_frm(int i)
 	  pt_t * pt = pd->pd_base * NBPG + sizeof(pt_t) * vf->pt_offset;
 	 */
 	  int store,pageth;
-	  if(bsm_lookup(frm_tab[i].fr_pid,frm_tab[i].fr_vpno/NBPG,&store,&pageth))
+	  if(bsm_lookup(frm_tab[i].fr_pid,frm_tab[i].fr_vpno*NBPG,&store,&pageth)==SYSERR)
 	  {
 		  restore(ps);
 		  return SYSERR;
