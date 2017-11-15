@@ -304,7 +304,7 @@ void create_global_pt(int pid)
 		frm_tab[frame].fr_pid = pid;
 		frm_tab[frame].fr_type = FR_TBL;
 		frm_tab[frame].fr_vpno = -1;
-		frm_tab[frame].fr_sc = 1;
+		frm_tab[frame].fr_age = 0;
 		pt_t *pt_entry = (FRAME0+frame) * NBPG;
 		for(j=0; j<P_SIZE; j++)
 		{
@@ -331,7 +331,7 @@ void create_page_directory(int pid)
 	frm_tab[frame].fr_pid = pid;
 	frm_tab[frame].fr_type = FR_DIR;
 	frm_tab[frame].fr_vpno = -1;
-	frm_tab[frame].fr_sc = 1;
+	frm_tab[frame].fr_age = 0;
 	proctab[pid].pdbr = (FRAME0+frame)*NBPG;
 	pd_t *pd_entry = (FRAME0+frame)*NBPG;
 	for(j; j< P_SIZE; j++)

@@ -83,7 +83,7 @@ SYSCALL init_frm()
 	  frm_tab[i].fr_refcnt = 0;
 	  frm_tab[i].fr_type = -1;
 	  frm_tab[i].fr_dirty = 0;
-	  frm_tab[i].fr_sc = 1;
+	  frm_tab[i].fr_age = 0;
   }
   return OK;
 }
@@ -98,7 +98,6 @@ SYSCALL get_frm(int* avail)
   disable(ps);
   int i =0;
 
-  //kprintf("PFINTR\n");
   for(i; i<NFRAMES; i++)
   {
 	  if(frm_tab[i].fr_status == FRM_UNMAPPED)
@@ -111,7 +110,6 @@ SYSCALL get_frm(int* avail)
   if(page_replace_policy == SC)
   {
 	  i = qhead;
-	  kprintf("SC frame counter %d\n",i);
 	  while(1)
 	  {
 		  struct pentry *pptr = &proctab[frm_tab[i].fr_pid];
@@ -140,7 +138,7 @@ SYSCALL get_frm(int* avail)
   }
   if(page_replace_policy == AGING)
   {
-	  kprintf("Aging");
+	  kprintf("Aging\n");
 	  i = qhead;
 	  int young_age = 256;
 	  int young_f = i;
@@ -152,15 +150,15 @@ SYSCALL get_frm(int* avail)
 		  if(pt->pt_acc == 1)
 		  {
 			  pt->pt_acc = 0;
-			  frm_tab[i].fr_sc = frm_tab[i].fr_sc << 1;
-			  if(frm_tab[i].fr_sc > 255)
+			  frm_tab[i].fr_age = frm_tab[i].fr_age << 1;
+			  if(frm_tab[i].fr_age > 255)
 			  {
-				  frm_tab[i].fr_sc = 255;
+				  frm_tab[i].fr_age = 255;
 			  }
 		  }
-		  if(young_age > frm_tab[i].fr_sc )
+		  if(young_age > frm_tab[i].fr_age )
 		  {
-			  young_age = frm_tab[i].fr_sc;
+			  young_age = frm_tab[i].fr_age;
 			  young_f = i;
 		  }
 		  i = rq[i].next;
@@ -217,7 +215,7 @@ SYSCALL free_frm(int i)
 	  frm_tab[i].fr_refcnt = 0;
 	  frm_tab[i].fr_type = -1;
 	  frm_tab[i].fr_dirty = 0;
-	  frm_tab[i].fr_sc = 0;
+	  frm_tab[i].fr_age = 0;
 
 	  pt->pt_pres = 0;
 	  pt->pt_acc =0;
@@ -229,10 +227,11 @@ SYSCALL free_frm(int i)
 		  frm_tab[pd->pd_base - FRAME0].fr_vpno = -1;
 		  frm_tab[pd->pd_base - FRAME0].fr_type = -1;
 		  frm_tab[pd->pd_base - FRAME0].fr_dirty = 0;
-		  frm_tab[pd->pd_base - FRAME0].fr_sc = 0;
+		  frm_tab[pd->pd_base - FRAME0].fr_age = 0;
 		  pd->pd_pres = 0;
 	  }
   }
+  kprintf("Error in free frame");
   restore(ps);
   return OK;
 }
@@ -257,7 +256,7 @@ SYSCALL free_prvt_frm(int i)
 		  frm_tab[i].fr_refcnt = 0;
 		  frm_tab[i].fr_type = -1;
 		  frm_tab[i].fr_dirty = 0;
-		  frm_tab[i].fr_sc = 1;
+		  frm_tab[i].fr_age = 0;
 
 		  pt->pt_pres = 0;
 		  frm_tab[pd->pd_base - FRAME0].fr_refcnt--;
@@ -268,10 +267,11 @@ SYSCALL free_prvt_frm(int i)
 			  frm_tab[pd->pd_base - FRAME0].fr_vpno = -1;
 			  frm_tab[pd->pd_base - FRAME0].fr_type = -1;
 			  frm_tab[pd->pd_base - FRAME0].fr_dirty = 0;
-			  frm_tab[pd->pd_base - FRAME0].fr_sc = 1;
+			  frm_tab[pd->pd_base - FRAME0].fr_age = 0;
 			  pd->pd_pres = 0;
 		  }
 	  }
+	  kprintf("Error in free private frame");
 	  restore(ps);
 	  return OK;
 }

@@ -81,6 +81,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth)
 			}
 		}
 	}
+	kprintf("Error in bsm lookup");
 	return SYSERR;
 }
 
@@ -133,7 +134,6 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 	int  store, bs_offset;
 	if(bsm_lookup(pid, vpno*VIRTUAL_BASE_ADDR, &store, &bs_offset) == SYSERR)
 	{
-		kprintf("lookup error \n");
 		return SYSERR;
 	}
 	int i =0;
@@ -148,14 +148,12 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag)
 				{
 					if( free_frm(i) == SYSERR)
 					{
-						kprintf("free_frm lookup error \n");
 						return SYSERR;
 					}
 				}
 				else
 				{
 					if(free_prvt_frm(i) == SYSERR){
-						kprintf("free_frm private lookup error \n");
 						return SYSERR;
 					}
 				}

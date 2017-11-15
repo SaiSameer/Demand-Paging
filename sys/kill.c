@@ -39,7 +39,6 @@ SYSCALL kill(int pid)
 		close(dev);
 
 	int i=0;
-	sleep(3);
 
 	for(i; i< BS_COUNT; i++)
 	{
@@ -65,7 +64,7 @@ SYSCALL kill(int pid)
 	frm_tab[pd_frm].fr_refcnt = 0;
 	frm_tab[pd_frm].fr_type = -1;
 	frm_tab[pd_frm].fr_dirty = 0;
-	frm_tab[pd_frm].fr_sc = 1;
+	frm_tab[pd_frm].fr_age = 0;
 
 	send(pptr->pnxtkin, pid);
 

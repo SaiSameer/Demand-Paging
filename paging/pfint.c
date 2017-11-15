@@ -44,7 +44,7 @@ SYSCALL pfint()
 	  frm_tab[frame].fr_refcnt = 0;
 	  frm_tab[frame].fr_type = FR_TBL;
 	  frm_tab[frame].fr_dirty = 0;
-	  frm_tab[frame].fr_sc =1;
+	  frm_tab[frame].fr_age =0;
 	  pt_t *pt=(pt_t*)((FRAME0+frame)*NBPG);
 	  for(i=0; i< P_SIZE; i++)
 	  {
@@ -76,7 +76,7 @@ SYSCALL pfint()
 	  frm_tab[frame].fr_refcnt = 1;
 	  frm_tab[frame].fr_type = FR_PAGE;
 	  frm_tab[frame].fr_dirty = 0;
-	  frm_tab[frame].fr_sc = 1;
+	  frm_tab[frame].fr_age = 0;
 
 	  frm_tab[pd->pd_base - FRAME0].fr_refcnt++;
 	  pt->pt_pres = 1;
